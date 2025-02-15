@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from disaster_finder_agent import identify_disasters
+# from disaster_finder_agent import identify_disasters
 
 app = FastAPI()
 
