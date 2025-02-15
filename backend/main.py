@@ -1,23 +1,23 @@
-import json
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-# from disaster_finder_agent import identify_disasters
+from disaster_finder_agent import (generate_disaster_response,
+                                   identify_disasters)
+from calling_agent import generate_call_message, make_call
 
 app = FastAPI()
-# Allow requests from your frontend (adjust origins as needed)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Update with your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-
-disasters = []
+# List of all currently known disasters since the last query.
+app.current_disasters = []
 
 
 @app.get("/")
@@ -27,32 +27,43 @@ async def read_root():
 
 @app.get("/disaster")
 async def read_disaster():
-    # current_disasters = identify_disasters("./tweets.json")
-    # response = {"disasters": []}
+    current_disasters = identify_disasters("./tweets.json")
+    disaster_response = generate_disaster_response(current_disasters)
+    app.current_disasters = current_disasters
+    app.disaster_response = disaster_response
 
-    # for disaster, tweets in current_disasters.items():
-    #     response["disasters"].append({
-    #         "disaster_id": len(response["disasters"]),
-    #         "name": disaster,
-    #         "Location": tweets[0].location,
-    #         "Date": tweets[0].date,
-    #     })
-
-    return {"disasters": [{"disaster_id": 0, "name": "LA Fire", "Location": "Los Angeles", "Date": "2025-01-07"}]}
+    return disaster_response
 
 
 @app.get("/tweets/{disaster_id}")
-async def read_tweets():
+async def read_tweets(disaster_id: int):
     """
     Returns the tweets related to the given disaster id.
     """
     # Read the file tweets.json and send the content as response
-    with open("./tweets.json", "r") as file:
-        data = json.load(file)
+    for i, disaster in enumerate(app.current_disasters):
+        if i == disaster_id:
+            return [tweet.model_dump() for tweet in app.current_disasters[disaster]]
 
-    return data
+    raise HTTPException(status_code=400, detail="Disaster not found.")
 
+
+@app.get("/call_911/{disaster_id}")
+async def call_911(disaster_id: int):
+    """
+    Makes a call to the authorities about the given disaster.
+    """
+    for disaster in app.disaster_response:
+        if disaster["id"] == disaster_id:
+            tweets = app.current_disasters[disaster["disaster_name"]]
+            message = generate_call_message(disaster, tweets)
+            print("Making call to 911:", message)
+            make_call(message)
+            return {"message": message}
+
+    raise HTTPException(status_code=400, detail="Disaster not found.")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000,
+                reload=True, log_level="debug")

@@ -3,3 +3,4 @@ openai
 twilio
 fastapi
 uvicorn
+pydantic
