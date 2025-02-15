@@ -1,4 +1,3 @@
-from fastapi.middleware.cors import CORSMiddleware
 import json
 from pathlib import Path
 
@@ -6,22 +5,6 @@ from fastapi import FastAPI, HTTPException
 from disaster_finder_agent import identify_disasters
 
 app = FastAPI()
-
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 disasters = []
 
@@ -47,7 +30,7 @@ async def read_disaster():
     return {"disasters": [{"disaster_id": 0, "name": "LA Fire", "Location": "Los Angeles", "Date": "2025-01-07"}]}
 
 
-@app.get("/tweets/{disaster_id}/{page}")
+@app.get("/tweets/{disaster_id}")
 async def read_tweets():
     """
     Returns the tweets related to the given disaster id.
