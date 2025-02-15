@@ -1,24 +1,38 @@
-import os
-from openai import OpenAI
+import json
+from pathlib import Path
 
-from dotenv import load_dotenv
-load_dotenv()
+from fastapi import FastAPI, HTTPException
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+app = FastAPI()
 
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
-)
 
-completion = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {
-            "role": "user",
-            "content": "Write a haiku about recursion in programming."
-        }
-    ]
-)
+@app.get("/")
+async def read_root():
+    raise HTTPException(status_code=404, detail="Root page not supported.")
 
-print(completion)
+
+@app.get("/disaster")
+async def read_disaster():
+    # TODO: Perform sentiment analysis on tweets, figure out if there is a disaster, and return info.
+    return {"disasters": [{"disaster_id": 0, "name": "LA Fire", "Location": "Los Angeles", "Date": "2025-01-07"}]}
+
+
+@app.get("/tweets/{disaster_id}")
+async def read_tweets():
+    """
+    Returns the tweets related to the given disaster id.
+    """
+    # Read the file tweets.json and send the content as response
+    with open("./tweets.json", "r") as file:
+        data = json.load(file)
+
+    return data
+
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: str | None = None):
+    return {"item_id": item_id, "query": q}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
