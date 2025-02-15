@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Tweet } from "react-twitter-widgets";
 
 const API_URL = "http://localhost:8000/tweets/0"; // Replace with actual disaster_id
 
 export default function TweetGrid() {
-  const [tweets, setTweets] = useState([]); // State to store tweets from the backend
+  const [tweets, setTweets] = useState([]); // Store tweets from backend
+  const [startIndex, setStartIndex] = useState(0); // Track current tweet batch
+  const [fadeIn, setFadeIn] = useState(true); // Track fade animation
+  const tweetContainerRef = useRef(null); // Reference to maintain height
 
   // Fetch tweets from backend when component mounts
   useEffect(() => {
     const fetchTweets = async () => {
       try {
-        const response = await fetch(API_URL, { mode: 'no-cors'});
-        const data = await response;
-        console.log(data);
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        console.log(data); // Debugging: Check JSON structure
 
-        // Convert tweet IDs into valid Twitter embed URLs
-        const tweetUrls = data.map((tweet) => `https://twitter.com/i/web/status/${tweet.id}`);
-
-        setTweets(tweetUrls);
+        setTweets(data); // Store raw JSON data
       } catch (error) {
         console.error("Error fetching tweets:", error);
       }
@@ -25,23 +26,34 @@ export default function TweetGrid() {
     fetchTweets();
   }, []);
 
-  // Ensure Twitter embeds reload after tweets update
+  // Rotate tweets every 5 seconds with fade animation
   useEffect(() => {
-    if (window.twttr) {
-      window.twttr.widgets.load();
-    }
+    if (tweets.length === 0) return; // Ensure tweets exist before starting rotation
+
+    const interval = setInterval(() => {
+      setFadeIn(false); // Start fade out
+      setTimeout(() => {
+        setStartIndex((prevIndex) => (prevIndex + 3) % tweets.length);
+        setFadeIn(true); // Start fade in after new tweets load
+      }, 1500); // Extended fade transition time (1.5s)
+    }, 5000);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [tweets]);
 
   return (
-    <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+    <div
+      ref={tweetContainerRef} // Maintain height of this section
+      className={`mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 
+        transition-opacity duration-[1500ms] ${fadeIn ? "opacity-100" : "opacity-0"}`}
+      style={{ minHeight: "700px" }} // Ensures a fixed minimum height
+    >
       {tweets.length === 0 ? (
         <p className="text-center col-span-3 text-gray-500">Loading tweets...</p>
       ) : (
-        tweets.map((tweetUrl, index) => (
-          <div key={index} className="flex max-w-xl flex-col items-start justify-between bg-white p-4 rounded-lg shadow-md">
-            <blockquote className="twitter-tweet">
-              <a href={tweetUrl}></a>
-            </blockquote>
+        tweets.slice(startIndex, startIndex + 3).map((tweet) => (
+          <div key={tweet.id} className="flex justify-center">
+            <Tweet tweetId={tweet.id.toString()} />
           </div>
         ))
       )}
