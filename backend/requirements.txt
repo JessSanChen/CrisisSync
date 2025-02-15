@@ -2,4 +2,4 @@ python-dotenv
 openai
 twilio
 fastapi
-uvicorno
+uvicorn
