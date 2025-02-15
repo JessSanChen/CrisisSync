@@ -1,6 +1,8 @@
 # Download the helper library from https://www.twilio.com/docs/python/install
 import os
 from twilio.rest import Client
+from dotenv import load_dotenv
+load_dotenv()
 
 # Find your Account SID and Auth Token at twilio.com/console
 # and set the environment variables. See http://twil.io/secure
@@ -10,8 +12,8 @@ client = Client(account_sid, auth_token)
 
 call = client.calls.create(
     twiml="<Response><Say>Ahoy, World!</Say></Response>",
-    to="+14155551212",
-    from_="+15017122661",
+    to="+18322693801",
+    from_="+19415417971",
 )
 
 print(call.sid)
