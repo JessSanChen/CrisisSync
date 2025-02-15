@@ -7,6 +7,7 @@ import TweetEmbed from '../components/TweetEmbed'
 import TweetsCarousel from '../components/TweetsCarousel'
 import ImageCarousel from '../components/ImageCarousel'
 import TweetGrid from '../components/TweetGrid'
+import DisasterInfo from '../components/DisasterInfo'
 
 
 import {APIProvider, Map} from '@vis.gl/react-google-maps';
@@ -41,6 +42,22 @@ const posts = [
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const [disaster, setDisaster] = useState(null);
+
+  useEffect(() => {
+    const fetchDisasterData = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        setDisaster(data);
+      } catch (error) {
+        console.error("Error fetching disaster data:", error);
+      }
+    };
+
+    fetchDisasterData();
+  }, []);
 
   return (
     <div className="bg-white">
@@ -190,14 +207,25 @@ export default function LandingPage() {
     <div className="relative isolate px-6 pt-14 lg:px-8">
     <section className="bg-white py-16">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
-          What People Are Saying
+          Monitoring Tweets and aggregating residents' concerns...
         </h2>
         <TweetGrid />
       </section>
     </div>
 
+    {/* Disaster Info Section */}
+    <div className="bg-white">
+      <section className="max-w-3xl mx-auto mt-10 p-6 bg-gray-50 rounded-lg shadow-md">
+        <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">Disaster Response</h2>
+        <DisasterInfo disaster={disaster} />
+      </section>
+    </div>
+
     {/* Google Maps Section */}
     <div className="relative isolate px-6 pt-14 lg:px-8">
+    <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
+          Triangulating potential areas to prioritize resource allocation...
+        </h2>
     <APIProvider apiKey={'AIzaSyARXL4ZQ-Mll9YXKRtJlPyKY6b60CyNjeI'} onLoad={() => console.log('Maps API has loaded.')}>
       {/* <h1>Hello, world!</h1> */}
       <Map
