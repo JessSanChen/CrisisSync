@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Tweet } from "react-twitter-widgets";
 
 const API_URL = "http://localhost:8000/tweets/0"; // Replace with actual disaster_id
 
 export default function TweetGrid() {
   const [tweets, setTweets] = useState([]); // Store tweets from backend
+  const [startIndex, setStartIndex] = useState(0); // Track current tweet batch
+  const [fadeIn, setFadeIn] = useState(true); // Track fade animation
+  const tweetContainerRef = useRef(null); // Reference to maintain height
 
   // Fetch tweets from backend when component mounts
   useEffect(() => {
@@ -11,9 +15,9 @@ export default function TweetGrid() {
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        console.log(data); // Debugging: check JSON structure
+        console.log(data); // Debugging: Check JSON structure
 
-        setTweets(data); // Store raw JSON data instead of Twitter embed URLs
+        setTweets(data); // Store raw JSON data
       } catch (error) {
         console.error("Error fetching tweets:", error);
       }
@@ -22,16 +26,34 @@ export default function TweetGrid() {
     fetchTweets();
   }, []);
 
+  // Rotate tweets every 5 seconds with fade animation
+  useEffect(() => {
+    if (tweets.length === 0) return; // Ensure tweets exist before starting rotation
+
+    const interval = setInterval(() => {
+      setFadeIn(false); // Start fade out
+      setTimeout(() => {
+        setStartIndex((prevIndex) => (prevIndex + 3) % tweets.length);
+        setFadeIn(true); // Start fade in after new tweets load
+      }, 1500); // Extended fade transition time (1.5s)
+    }, 5000);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [tweets]);
+
   return (
-    <div className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      ref={tweetContainerRef} // Maintain height of this section
+      className={`mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 
+        transition-opacity duration-[1500ms] ${fadeIn ? "opacity-100" : "opacity-0"}`}
+      style={{ minHeight: "700px" }} // Ensures a fixed minimum height
+    >
       {tweets.length === 0 ? (
         <p className="text-center col-span-3 text-gray-500">Loading tweets...</p>
       ) : (
-        tweets.map((tweet, index) => (
-          <div key={index} className="flex flex-col bg-white p-4 rounded-lg shadow-md border border-gray-200">
-            <p className="text-sm text-gray-500">{new Date(tweet.time).toLocaleString()}</p>
-            <p className="text-blue-600 font-semibold">{tweet.author}</p>
-            <p className="text-gray-900 mt-2">{tweet.content}</p>
+        tweets.slice(startIndex, startIndex + 3).map((tweet) => (
+          <div key={tweet.id} className="flex justify-center">
+            <Tweet tweetId={tweet.id.toString()} />
           </div>
         ))
       )}

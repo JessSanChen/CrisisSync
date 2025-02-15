@@ -187,12 +187,14 @@ export default function LandingPage() {
       
 
     {/* Tweet Grid Section */}
+    <div className="relative isolate px-6 pt-14 lg:px-8">
     <section className="bg-white py-16">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
           What People Are Saying
         </h2>
         <TweetGrid />
       </section>
+    </div>
 
     {/* Google Maps Section */}
     <div className="relative isolate px-6 pt-14 lg:px-8">
