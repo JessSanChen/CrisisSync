@@ -4,41 +4,34 @@ export default function DisasterInfo({ disaster }) {
   if (!disaster) return <p className="text-center text-gray-500">Loading disaster details...</p>;
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <div className="px-4 sm:px-0">
-        <h3 className="text-lg font-semibold text-gray-900">Disaster Information</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Current disaster details and recommended action plan.
-        </p>
+    <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 max-w-4xl mx-auto">
+      {/* Disaster Name */}
+      <h2 className="text-2xl font-bold text-red-600">{disaster.disaster_name}</h2>
+      <p className="text-gray-600 mt-2">{disaster.description}</p>
+
+      {/* Location */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold text-gray-900">Location</h3>
+        <p className="text-gray-700">{disaster.location}</p>
       </div>
-      <div className="mt-6 border-t border-gray-100">
-        <dl className="divide-y divide-gray-100">
-          <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium text-gray-900">Disaster Category</dt>
-            <dd className="mt-1 text-sm text-gray-700 sm:col-span-2 sm:mt-0">{disaster.category}</dd>
-          </div>
-          <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium text-gray-900">Severity Level</dt>
-            <dd
-              className={`mt-1 text-sm font-bold sm:col-span-2 sm:mt-0 
-                ${
-                  disaster.severity === "Severe"
-                    ? "text-red-600"
-                    : disaster.severity === "Moderate"
-                    ? "text-orange-500"
-                    : "text-green-600"
-                }`}
-            >
-              {disaster.severity}
-            </dd>
-          </div>
-          <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium text-gray-900">Recommended Action</dt>
-            <dd className="mt-1 text-sm text-gray-700 sm:col-span-2 sm:mt-0">
-              {disaster.actionPlan}
-            </dd>
-          </div>
-        </dl>
+
+      {/* Severity */}
+      <div className="mt-4 flex items-center space-x-2">
+        <h3 className="text-lg font-semibold text-gray-900">Severity:</h3>
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold text-white"
+          style={{ backgroundColor: disaster.severity.includes("Extreme") ? "#DC2626" : "#F59E0B" }}>
+          {disaster.severity}
+        </span>
+      </div>
+
+      {/* Action Plan */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold text-gray-900">Recommended Action Plan</h3>
+        <ul className="list-decimal list-inside text-gray-700 mt-2 space-y-2">
+          {disaster.action_plan.split(". ").map((step, index) => (
+            <li key={index}>{step.trim()}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
