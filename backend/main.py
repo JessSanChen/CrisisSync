@@ -19,6 +19,7 @@ app.add_middleware(
 
 # List of all currently known disasters since the last query.
 app.current_disasters = []
+app.disaster_response = {}
 
 
 @app.get("/")
