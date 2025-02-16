@@ -52,7 +52,7 @@ class DisasterInfo(BaseModel):
 
 
 class Tweet(BaseModel):
-    id: int
+    id: str
     content: str
     location: str
 
@@ -81,7 +81,7 @@ def identify_disasters(path: str):
             if info.is_disaster:
                 if info.disaster_name not in current_disasters:
                     current_disasters[info.disaster_name] = []
-                tweet = Tweet(id=tweet["id"],
+                tweet = Tweet(id=str(tweet["id"]),
                               content=tweet["content"],
                               location=info.location)
                 current_disasters[info.disaster_name].append(tweet)
@@ -109,7 +109,7 @@ def generate_disaster_response(disasters):
         info.disaster_name = disaster_name
 
         disaster_responses.append({
-            "id": str(len(disaster_responses)),
+            "id": len(disaster_responses),
             "disaster_name": info.disaster_name,
             "location": info.location,
             "description": info.description,
