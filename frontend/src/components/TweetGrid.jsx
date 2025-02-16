@@ -36,7 +36,7 @@ export default function TweetGrid() {
         setStartIndex((prevIndex) => (prevIndex + 3) % tweets.length);
         setFadeIn(true); // Start fade in after new tweets load
       }, 1500); // Extended fade transition time (1.5s)
-    }, 5000);
+    }, 7500);
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, [tweets]);

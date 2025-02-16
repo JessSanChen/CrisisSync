@@ -8,9 +8,10 @@ import TweetsCarousel from '../components/TweetsCarousel'
 import ImageCarousel from '../components/ImageCarousel'
 import TweetGrid from '../components/TweetGrid'
 import DisasterInfo from '../components/DisasterInfo'
+import DynamicScriptDisplay from '../components/Call'
 
 
-import {APIProvider, Map} from '@vis.gl/react-google-maps';
+import { APIProvider, Map } from '@vis.gl/react-google-maps';
 
 const navigation = [
   { name: 'Monitoring', href: '#' },
@@ -45,6 +46,8 @@ export default function LandingPage() {
 
   const [disaster, setDisaster] = useState(null);
 
+  let scrolledTo = []
+
   useEffect(() => {
     const fetchDisasterData = async () => {
       try {
@@ -54,7 +57,30 @@ export default function LandingPage() {
         console.log("Disaster Info:", data); // Debugging Output
 
         // Set the first object in the array, not the whole array
-        setDisaster(data[0]);  
+        setDisaster(data[0]);
+
+        // Handle auto-scroll
+        const sections = document.querySelectorAll(".section");
+        let currentSection = 0;
+        console.log(sections);
+
+        const scrollNext = () => {
+          if (currentSection < sections.length) {
+            if (scrolledTo.includes(currentSection)) {
+              return
+            }
+            scrolledTo.push(currentSection)
+            sections[currentSection].scrollIntoView({ behavior: "smooth" });
+            console.log("scrolling to section", currentSection);
+
+            setTimeout(() => {
+              currentSection++;
+              scrollNext();
+            }, 5000); // Adjust delay for pause duration
+          }
+        };
+
+        setTimeout(scrollNext, 1000);
       } catch (error) {
         console.error("Error fetching disaster data:", error);
       }
@@ -177,7 +203,7 @@ export default function LandingPage() {
               CrisisSync
             </h1>
             <p className="mt-8 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">
-            Coordinating relief, saving lives.
+              Coordinating relief, saving lives.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
@@ -205,47 +231,52 @@ export default function LandingPage() {
           />
         </div>
       </div>
-      
 
-    {/* Tweet Grid Section */}
-    <div className="relative isolate px-6 pt-14 lg:px-8">
-    <section className="bg-white py-16">
+
+      {/* Tweet Grid Section */}
+      <div className="relative isolate px-6 pt-14 lg:px-8 section">
+        <section className="bg-white py-16">
+          <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
+            Monitoring Tweets and aggregating residents' concerns...
+          </h2>
+          <TweetGrid />
+        </section>
+      </div>
+
+      {/* Disaster Info Section */}
+      <div className="bg-white min-h-screen flex flex-col items-center py-12 section">
+        <h1 className="text-3xl font-bold text-gray-900">Disaster Response</h1>
+        <p className="text-gray-600 mb-6">Real-time updates on disasters and recommended actions.</p>
+
+        <DisasterInfo disaster={disaster} />
+      </div>
+
+      {/* Google Maps Section */}
+      <div className="relative isolate px-6 pt-14 lg:px-8 section">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
-          Monitoring Tweets and aggregating residents' concerns...
-        </h2>
-        <TweetGrid />
-      </section>
-    </div>
-
-    {/* Disaster Info Section */}
-    <div className="bg-white min-h-screen flex flex-col items-center py-12">
-      <h1 className="text-3xl font-bold text-gray-900">Disaster Response</h1>
-      <p className="text-gray-600 mb-6">Real-time updates on disasters and recommended actions.</p>
-
-      <DisasterInfo disaster={disaster} />
-    </div>
-
-    {/* Google Maps Section */}
-    <div className="relative isolate px-6 pt-14 lg:px-8">
-    <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
           Triangulating potential areas to prioritize resource allocation...
         </h2>
-    <APIProvider apiKey={'AIzaSyARXL4ZQ-Mll9YXKRtJlPyKY6b60CyNjeI'} onLoad={() => console.log('Maps API has loaded.')}>
-      {/* <h1>Hello, world!</h1> */}
-      <Map
-        style={{ width: "100%", height: "500px" }}
-        defaultZoom={13}
-        defaultCenter={{ lat: -33.860664, lng: 151.208138 }}
-        onCameraChanged={(ev) =>
-          console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
-        }
-      />
-    </APIProvider>
-    </div>
+        <APIProvider apiKey={'AIzaSyARXL4ZQ-Mll9YXKRtJlPyKY6b60CyNjeI'} onLoad={() => console.log('Maps API has loaded.')}>
+          {/* <h1>Hello, world!</h1> */}
+          <Map
+            style={{ width: "100%", height: "500px" }}
+            defaultZoom={13}
+            defaultCenter={{ lat: -33.860664, lng: 151.208138 }}
+            onCameraChanged={(ev) =>
+              console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
+            }
+          />
+        </APIProvider>
+      </div>
+
+      <div className="bg-white min-h-screen flex flex-col items-center py-12 section">
+        <h1 className="text-3xl font-bold text-gray-900">Contacting authorities</h1>
+        <p className="text-gray-600 mb-6">Calling 911 with relevant information...</p>
+
+        <DynamicScriptDisplay />
+      </div>
 
 
-
-      
     </div>
   )
 }
