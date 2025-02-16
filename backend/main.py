@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from disaster_finder_agent import (generate_disaster_response,
                                    identify_disasters)
 from calling_agent import generate_call_message, make_call
+from verification_agent import verify_disaster
 
 app = FastAPI()
 app.add_middleware(
@@ -54,7 +55,14 @@ async def call_911(disaster_id: int):
     Makes a call to the authorities about the given disaster.
     """
     for disaster in app.disaster_response:
-        if disaster["id"] == str(disaster_id):
+        if disaster["id"] == disaster_id:
+            # Verify this disaster is real.
+            is_real_disaster = verify_disaster(disaster["disaster_name"])
+
+            if not is_real_disaster:
+                return {"message": "Disaster is potentially unverified. Not calling 911."}
+
+            # Generate a message to send to 911.
             tweets = app.current_disasters[disaster["disaster_name"]]
             message = generate_call_message(disaster, tweets)
             print("Making call to 911:", message)
