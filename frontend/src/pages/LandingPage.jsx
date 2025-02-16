@@ -13,10 +13,10 @@ import DisasterInfo from '../components/DisasterInfo'
 import {APIProvider, Map} from '@vis.gl/react-google-maps';
 
 const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
+  { name: 'Monitoring', href: '#' },
+  { name: 'Identifying', href: '#' },
+  { name: 'Triangulating', href: '#' },
+  { name: 'Notifying', href: '#' },
 ]
 
 const posts = [
@@ -43,24 +43,25 @@ const posts = [
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const [disaster, setDisaster] = useState(null); // Store disaster data
+  const [disaster, setDisaster] = useState(null);
 
-    // Function to fetch disaster data
+  useEffect(() => {
     const fetchDisasterData = async () => {
       try {
-        const response = await fetch("http://localhost:8000/disaster"); // Fetch data
-        const data = await response.json(); // Parse JSON
-        console.log("Disaster Info:", data); // Log data to console
-        setDisaster(data); // Save data to state
+        const response = await fetch("http://localhost:8000/disaster");
+        const data = await response.json();
+
+        console.log("Disaster Info:", data); // Debugging Output
+
+        // Set the first object in the array, not the whole array
+        setDisaster(data[0]);  
       } catch (error) {
         console.error("Error fetching disaster data:", error);
       }
     };
 
-    // Fetch data when the component mounts
-    useEffect(() => {
-      fetchDisasterData();
-    }, []);
+    fetchDisasterData();
+  }, []);
 
 
   return (
@@ -217,12 +218,12 @@ export default function LandingPage() {
     </div>
 
     {/* Disaster Info Section */}
-    {/* <div className="bg-white">
-      <section className="max-w-3xl mx-auto mt-10 p-6 bg-gray-50 rounded-lg shadow-md">
-        <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">Disaster Response</h2>
-        <DisasterInfo disaster={disaster} />
-      </section>
-    </div> */}
+    <div className="bg-white min-h-screen flex flex-col items-center py-12">
+      <h1 className="text-3xl font-bold text-gray-900">Disaster Response</h1>
+      <p className="text-gray-600 mb-6">Real-time updates on disasters and recommended actions.</p>
+
+      <DisasterInfo disaster={disaster} />
+    </div>
 
     {/* Google Maps Section */}
     <div className="relative isolate px-6 pt-14 lg:px-8">
