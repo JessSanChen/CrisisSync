@@ -26,8 +26,8 @@ Disasters:
 disaster_response_prompt = """
 You are a disaster response expert looking at tweets for an ongoing disaster. You will be given the name
 of the disaster, as well as a list of tweets and their locations. Identify the general region the disaster
-is taking place, a brief description of the disaster, and an action plan for people in the area. Do not
-use information not included in the tweets.
+is taking place, a brief description of the disaster, an action plan for people in the area, and the severity
+of the event. Do not use information not included in the tweets.
 
 Disaster: {disaster_name}
 
@@ -48,6 +48,7 @@ class DisasterInfo(BaseModel):
     location: str
     description: str
     action_plan: str
+    severity: str
 
 
 class Tweet(BaseModel):
@@ -108,11 +109,12 @@ def generate_disaster_response(disasters):
         info.disaster_name = disaster_name
 
         disaster_responses.append({
-            "id": len(disaster_responses),
+            "id": str(len(disaster_responses)),
             "disaster_name": info.disaster_name,
             "location": info.location,
             "description": info.description,
             "action_plan": info.action_plan,
+            "severity": info.severity,
         })
 
     return disaster_responses
