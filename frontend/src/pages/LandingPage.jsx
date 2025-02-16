@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import TweetEmbed from '../components/TweetEmbed'
@@ -43,21 +43,25 @@ const posts = [
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const [disaster, setDisaster] = useState(null);
+  const [disaster, setDisaster] = useState(null); // Store disaster data
 
-  useEffect(() => {
+    // Function to fetch disaster data
     const fetchDisasterData = async () => {
       try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        setDisaster(data);
+        const response = await fetch("http://localhost:8000/disaster"); // Fetch data
+        const data = await response.json(); // Parse JSON
+        console.log("Disaster Info:", data); // Log data to console
+        setDisaster(data); // Save data to state
       } catch (error) {
         console.error("Error fetching disaster data:", error);
       }
     };
 
-    fetchDisasterData();
-  }, []);
+    // Fetch data when the component mounts
+    useEffect(() => {
+      fetchDisasterData();
+    }, []);
+
 
   return (
     <div className="bg-white">
@@ -214,12 +218,12 @@ export default function LandingPage() {
     </div>
 
     {/* Disaster Info Section */}
-    <div className="bg-white">
+    {/* <div className="bg-white">
       <section className="max-w-3xl mx-auto mt-10 p-6 bg-gray-50 rounded-lg shadow-md">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">Disaster Response</h2>
         <DisasterInfo disaster={disaster} />
       </section>
-    </div>
+    </div> */}
 
     {/* Google Maps Section */}
     <div className="relative isolate px-6 pt-14 lg:px-8">
