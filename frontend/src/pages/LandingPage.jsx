@@ -234,22 +234,17 @@ export default function LandingPage() {
     <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
           Triangulating potential areas to prioritize resource allocation...
         </h2>
-    {/* <APIProvider apiKey={'AIzaSyARXL4ZQ-Mll9YXKRtJlPyKY6b60CyNjeI'} onLoad={() => console.log('Maps API has loaded.')}>
-      <Map
-        setTweetLocations={setTweetLocations}
-        style={{ width: "100%", height: "500px" }}
-        defaultZoom={13}
-        defaultCenter={{ lat: -33.860664, lng: 151.208138 }}
-        onCameraChanged={(ev) =>
-          console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
-        }
-      />
-    </APIProvider> */}
     <GoogleMap tweetLocations={tweetLocations} />
     </div>
 
 
-
+    {/* Actionable Section */}
+    {/* <div className="relative isolate px-6 pt-14 lg:px-8">
+    <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
+          Identifying resource support centers...
+        </h2>
+    <GoogleMap tweetLocations={tweetLocations} />
+    </div> */}
       
     </div>
   )
