@@ -27,12 +27,7 @@ async def read_root():
 
 @app.get("/disaster")
 async def read_disaster():
-    current_disasters = identify_disasters("./tweets.json")
-    disaster_response = generate_disaster_response(current_disasters)
-    app.current_disasters = current_disasters
-    app.disaster_response = disaster_response
-
-    return disaster_response
+    return app.disaster_response
 
 
 @app.get("/tweets/{disaster_id}")
@@ -41,6 +36,11 @@ async def read_tweets(disaster_id: int):
     Returns the tweets related to the given disaster id.
     """
     # Read the file tweets.json and send the content as response
+    current_disasters = identify_disasters("./tweets.json")
+    disaster_response = generate_disaster_response(current_disasters)
+    app.current_disasters = current_disasters
+    app.disaster_response = disaster_response
+
     for i, disaster in enumerate(app.current_disasters):
         if i == disaster_id:
             return [tweet.model_dump() for tweet in app.current_disasters[disaster]]
