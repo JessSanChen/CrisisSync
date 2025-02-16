@@ -3,28 +3,34 @@ import { Tweet } from "react-twitter-widgets";
 
 const API_URL = "http://localhost:8000/tweets/0"; // Replace with actual disaster_id
 
-export default function TweetGrid() {
+export default function TweetGrid({ setTweetLocations }) {
   const [tweets, setTweets] = useState([]); // Store tweets from backend
   const [startIndex, setStartIndex] = useState(0); // Track current tweet batch
   const [fadeIn, setFadeIn] = useState(true); // Track fade animation
   const tweetContainerRef = useRef(null); // Reference to maintain height
-
-  // Fetch tweets from backend when component mounts
-  useEffect(() => {
-    const fetchTweets = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        console.log(data); // Debugging: Check JSON structure
-
-        setTweets(data); // Store raw JSON data
-      } catch (error) {
-        console.error("Error fetching tweets:", error);
-      }
-    };
-
-    fetchTweets();
-  }, []);
+  
+    useEffect(() => {
+      const fetchTweets = async () => {
+        try {
+          const response = await fetch(API_URL);
+          const data = await response.json();
+          console.log("Fetched Tweets:", data);
+  
+          setTweets(data);
+  
+          // Extract unique locations from tweets
+          const locations = data
+            .map((tweet) => tweet.location)
+            .filter((loc) => loc); // Remove empty locations
+  
+          setTweetLocations(locations); // Pass locations to the parent component
+        } catch (error) {
+          console.error("Error fetching tweets:", error);
+        }
+      };
+  
+      fetchTweets();
+    }, []);
 
   // Rotate tweets every 5 seconds with fade animation
   useEffect(() => {
