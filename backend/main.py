@@ -58,8 +58,7 @@ async def call_911(disaster_id: int):
     for disaster in app.disaster_response:
         if disaster["id"] == disaster_id:
             # Verify this disaster is real.
-            # is_real_disaster = verify_disaster(disaster)
-            is_real_disaster = True
+            is_real_disaster = verify_disaster(disaster)
 
             if not is_real_disaster:
                 return {"message": "Disaster is potentially unverified. Not calling 911."}
